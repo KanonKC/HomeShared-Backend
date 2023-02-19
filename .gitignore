@@ -2,5 +2,9 @@ env/
 __pycache__/
 
 *.png
+*.pdf
+*.webp
+*.jpg
+*.jpeg
 
 *.sqlite3

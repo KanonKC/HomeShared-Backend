@@ -5,17 +5,25 @@ from ..models import *
 from rest_framework import status
 from ..serializers import SharedPacketSerializers
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.forms.models import model_to_dict
 
-@api_view([POST])
+@api_view([GET,POST])
 @parser_classes([MultiPartParser,FormParser])
 def create_packet(request):
-    serializer = SharedPacketSerializers(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
+    if request.method == POST:
+        serializer = SharedPacketSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == GET:
+        packets = SharedPacket.objects.all()
+        serializer = SharedPacketSerializers(packets,many=True)
+        return Response({
+            'packets': serializer.data
+        },status=status.HTTP_201_CREATED)
+        
 @api_view([GET,PUT,DELETE])
 def manage_packet(request,packet_id):
     try:
